@@ -55,6 +55,11 @@ fun! viml#wildfilter(l, p)
     return ret
 endf
 
+fun! viml#getchar()
+    let ch = getchar()
+    return type(ch) == v:t_number ? nr2char(ch): ch
+endf
+
 if has('nvim') " {{{
     fun! viml#bufline(nr, l, t)
         if type(a:t) == v:t_list

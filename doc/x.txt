@@ -15,7 +15,7 @@ vim#gotowin({buf}, [{create}])                       *vim#gotowin*
             {create} is the action how to create the buffer if
                     it's not shown, "b", "edit", "tabe", "split" ...
 
-Viml utility functions:                              *x-viml-functions*
+VimL utility functions:                              *x-viml-functions*
 
 viml#curstr([{after} = 0])                           *viml#curstr*
             Get the text before the cursor in current line.
@@ -36,5 +36,33 @@ viml#bufvars({bnr}, {opts})                          *viml#bufvars*
             Get or set options of a buffer whoes number is {bnr}
             {opts} must be a list or dictionary, list is used for
                 get options, and dictionary for set
+
+Job functions:                                       *x-job-functions*
+
+job#start({cmd}[, {opts}])                           *job#start*
+            Same as "jobstart" function in neovim.
+
+job#stop({cmd})                                      *job#stop*
+            Same as "jobstop" function in neovim.
+
+job#info({id})                                       *job#info*
+            Same as "job_info" function in vim8.
+
+job#status({id})                                     *job#status*
+            Same as "job_status" function in vim8.
+
+job#send({id}, {data})                               *job#send*
+            Same as "jobsend" function in neovim.
+            
+Terminal functions:                                 *x-terminal-functions*
+
+term#open({cmd}[, {opts}])
+            Same as "termopen" function in neovim, but start a terminal
+            in a new buffer.
+
+term#alive([{term}])
+            If the job of {term} is alive, return 1, else 0.
+            {term} is a value returned by term#open
+            
 
 vim:tw=78:fo=tcq2:isk=!-~,^*,^\|,^\":ts=8:ft=help:norl:

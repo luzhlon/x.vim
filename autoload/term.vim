@@ -9,9 +9,12 @@ call assert_true(has('terminal'))
 
 if has('nvim')      " {{{
 fun! term#open(argv, ...) abort
-    ene
-    let job = call('termopen', [a:argv] + a:000)
-    norm! G
+    ene             " In new buffer start a terminal
+    try
+        let job = call('termopen', [a:argv] + a:000)
+        norm! G
+    catch
+    endt
     return job
 endf
 
@@ -22,29 +25,38 @@ endf
 " }}}
 else                " {{{
 fun! term#open(argv, ...) abort
-    let opts = extend(a:0 ? a:1 : {}, {'curwin': 1})
-    if has_key(opts, 'on_stdout')
-        fun! opts.out_cb(jid, data) dict
-            call self.on_stdout(a:jid, [a:data], 'stdout')
-        endf
+    let cb = a:0 ? a:1 : {}
+    let opts = {'curwin': 1}
+
+    if has_key(cb, 'detach')
+        let opts.stoponexit = ''
     endif
-    if has_key(opts, 'on_stderr')
-        fun! opts.err_cb(jid, data) dict
-            call self.on_stderr(a:jid, [a:data], 'stderr')
-        endf
+    if has_key(cb, 'on_stdout')
+        let opts.out_cb = {jid, data->
+            \ call(cb.on_stdout, [jid, [data], 'stdout'], cb)
+        \ }
     endif
-    if has_key(opts, 'on_exit')
-        fun! opts.exit_cb(jid, data) dict
-            call self.on_exit(a:jid, [a:data], 'exit')
-        endf
+    if has_key(cb, 'on_stderr')
+        let opts.err_cb = {jid, data->
+            \ call(cb.on_stderr, [jid, [data], 'stderr'], cb)
+        \ }
     endif
-    let job = term_start(a:argv, opts)
-    norm! G
+    if has_key(cb, 'on_exit')
+        let opts.exit_cb = {jid, data->
+            \ call(cb.on_exit, [jid, data, 'exit'], cb)
+        \ }
+    endif
+    try
+        let job = term_start(a:argv, opts)
+        norm! G
+    catch
+    endt
     return job
 endf
 
 fun! term#alive(...)
-    return &modified
+    let job = term_getjob(a:0 ? a:1 : bufname('%'))
+    return type(job) == v:t_job && job#status(job) == 'run'
 endf
 endif
 " }}}
