@@ -16,12 +16,10 @@ endf
 " Goto the buf's window if it is exists and return 1
 fun! vim#gotowin(buf, ...)
     let nr = bufnr(a:buf)
-    for tnr in range(1, tabpagenr('$'))
-        if index(tabpagebuflist(tnr), nr) >= 0
-            exe tnr 'tabn'
-            return win_gotoid(bufwinid(a:buf))
-        endif
-    endfor
+    let wid = win_findbuf(nr)
+    if len(wid)
+        return win_gotoid(wid[0])
+    endif
     " a:1 = edit | tabedit
     if a:0 | exe a:1 a:buf | endif
 endf
@@ -60,6 +58,7 @@ endf
 " Add a quickfix expression with correct encoding
 fun! vim#cadde(expr) abort
     caddexpr has('win32') ? iconv(a:expr, 'gbk', 'utf-8'): a:expr
+    cbottom
 endf
 
 " Add quickfix file with correct encoding
