@@ -57,7 +57,8 @@ endf
 
 " Add a quickfix expression with correct encoding
 fun! vim#cadde(expr) abort
-    caddexpr has('win32') ? iconv(a:expr, 'gbk', 'utf-8'): a:expr
+    let expr = type(a:expr) == v:t_list ? join(a:expr, "\n") : a:expr
+    caddexpr has('win32') ? iconv(expr, 'gbk', 'utf-8'): expr
     cbottom
 endf
 
